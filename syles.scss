@@ -1,0 +1,94 @@
+/*-- scss:defaults --*/
+
+// fonts
+@import 'https://fonts.googleapis.com/css2?family=Quicksand&display=swap';
+@import 'https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap';
+
+$font-family-sans-serif: 'Quicksand', sans-serif;
+$font-family: 'Source Code Pro', monospace;
+
+$presentation-heading-color: #15a7ae;
+$link-color: #a142fa;
+
+//
+// Color system
+//
+
+$casi-blanco: #fdfcfb !default;
+$morado: #88398A !default;
+$mint: #6ee4bf !default;
+$rosa: #E58D7D !default;
+
+
+
+/*-- scss:rules --*/
+
+/* colores */
+
+
+.reveal .fondomint {
+  background-color: $mint;
+  color: $casi-blanco;
+}
+
+.reveal .blanquimint {
+  background-color: $casi-blanco;
+  color: $mint;
+}
+
+
+/* alineación */
+
+.reveal .centrado {
+  text-align: center;
+}
+
+.reveal .derecha {
+  text-align: right;
+}
+
+/* cosas de las fuentes */
+
+
+.ultra-grande {
+  font-size: 3em;
+}
+
+.mas-grande {
+  font-size: 2em;
+}
+
+.grande {
+  font-size: 1.5em;
+}
+
+.mediano {
+  font-size: 1.2em;
+}
+
+.pequenio {
+  font-size: 0.75em;
+}
+
+.micro {
+  font-size: 0.5em;
+}
+
+.codigo {
+  font-family: "Source Code Pro";
+}
+
+.rosa {
+  color: $rosa;
+  font-weight: bold;
+}
+
+.mint {
+  color: $mint;
+  font-weight: bold;
+}
+
+.mint-claro {
+  color: #a5e0dd;
+  font-weight: bold;
+}

@@ -1,0 +1,358 @@
+---
+format: 
+  revealjs:
+    theme: syles.scss
+    fontcolor: "#515151"
+---
+
+
+# Haciendo Mapas con Python {background-color="black" background-image="img/Santiago.png" background-size="cover"}
+
+Stephanie Orellana
+
+Pycon Chile 2022
+
+
+## Sobre mi {.fondomint}
+
+::: {.columns}
+::: {.column width="60%" layout-align="left"}
+\> Stephanie Orellana (@sporella)
+
+\> Ingeniera Agrónoma y Magister en Recursos Naturales
+
+\> Científica de Datos
+
+\> PyLadies Valparaíso
+:::
+
+::: {.column width="40%" layout-align="left"}
+![](img/humedad_suelo.png){width=70%}
+![](img/pyladies_valpo_logo.png){width=70%}
+:::
+:::
+
+## Mapas :)
+
+:::{layout-ncol="3"}
+
+![](https://uploads-ssl.webflow.com/612571e62b498973d3849a09/612571e72b4989e456849c80_babylonian-stone-tablet.jpeg){width=20%}
+
+![](https://thumbor.bigedition.com/ortelius/9Ote1ctV8Yf1pUoQwuKKMXsks2E=/480x327/filters:format(webp):quality(80)/granite-web-prod/f2/b7/f2b7b187fe2c40f782afdb12d840e6e7.jpeg){width=40%}
+
+![](https://eoimages.gsfc.nasa.gov/images/imagerecords/79000/79198/ozone_1979-2011_lrg.jpg){width=30%}
+
+![](https://www.androidauthority.com/wp-content/uploads/2018/10/Uber-best-ride-sharing-apps-taxi-apps-android.jpg)
+
+![](https://cdn.pocket-lint.com/r/s/1200x630/assets/images/138234-games-review-pokemon-go-review-or-the-trials-and-tribulations-of-a-pokemon-go-addict-image1-a27El6hSPD.jpg)
+
+![](https://d3ch2pjl7c24y4.cloudfront.net/gameofthrones/GameOfThrones0201.jpg)
+:::
+
+## Tipos de datos espaciales
+
+:::{.columns}
+:::{.column}
+**Vectoriales**
+
+![](img/vectorcat.png)
+
+- `.shp` (shapefile)
+- `.geojson`
+- `.csv`
+- ...
+
+:::
+
+:::{.column}
+**Raster**
+
+![](img/pixelcat.png)
+
+- `.tif`
+- `.nc` (netcdf)
+- `.asc` (ascii)
+- `.hdf`
+- ...
+
+:::
+:::
+
+## Tipos de datos espaciales (ejemplos)
+
+:::{.columns}
+:::{.column}
+**Vectoriales**
+
+- Límites administrativos
+- Coordenadas puntuales
+- Caminos
+- Tracks de GPS
+:::
+
+:::{.column}
+**Raster**
+
+- Imágenes satelitales
+- Interpolaciones espaciales
+- Modelos climáticos
+- Modelos de elevación digital
+- Imágenes de drones
+:::
+:::
+
+## Paquetes
+
+:::{.columns}
+:::{.column width="30%"}
+**Vectoriales**
+
+\> `geopandas`
+
+:::
+
+:::{.column width="30%"}
+**Raster**
+
+\> `xarray`
+
+\> `rasterio`
+
+:::
+
+:::{.column width="30%"}
+**Visualización**
+
+\> `matplotlib`
+
+\> `folium`
+
+\> `plotly`
+
+\> `bokeh`
+
+\> `cartopy`
+
+:::
+:::
+
+## Pero, ¿dónde consigo los datos?
+
+- IDE (Infraestructura de datos espaciales)
+
+- Webs gubernamentales
+
+- NASA / COPERNICUS
+
+- Google Earth Engine
+
+- Open Street Map
+
+- Datos de campo (GPS)
+
+## Fuentes de Información
+
+:::{.columns}
+
+:::{.column}
+**En Chile**
+
+- [IDE Ministerio Medio Ambiente](https://ide.mma.gob.cl/)
+
+- [IDE Minagri](https://ide.minagri.gob.cl/geoweb/)
+
+- [IDE Chile](http://www.ide.cl/)
+
+- [Geodatos INE](https://geoine-ine-chile.opendata.arcgis.com/)
+
+- [Observatorio Ciudades UC](https://ideocuc-ocuc.hub.arcgis.com/search?collection=Dataset)
+
+- [Geonode CEDEUS](http://datos.cedeus.cl/)
+:::
+
+:::{.column}
+**Mundo**
+
+- [Our World in Data](https://ourworldindata.org/)
+
+- [Socioeconomic Data and Applications Center](https://sedac.ciesin.columbia.edu/data/sets/browse)
+
+- [The Fund for Peace](https://fragilestatesindex.org/excel/)
+
+- [Google Earth Engine](https://developers.google.com/earth-engine/datasets/)
+
+- [NASA](https://earthdata.nasa.gov/)
+
+- [PALEODEM](https://www.earthbyte.org/paleodem-resource-scotese-and-wright-2018/)
+:::
+:::
+
+## geopandas
+
+```{python}
+#| echo: true 
+
+import geopandas as gpd
+
+paradas = gpd.read_file("data/paradas_transantiago.json")
+paradas.plot();
+```
+
+## geopandas + folium
+
+```{python}
+#| echo: true
+import geopandas as gpd
+
+paradas = gpd.read_file("data/paradas_transantiago.json")
+paradas.explore()
+```
+
+## folium plugins
+```{python}
+#| echo: true
+#| eval: false
+from folium import plugins
+from folium.plugins import HeatMap
+
+m = paradas.explore()
+paradas['stop_lat'] = paradas['stop_lat'].astype(float)
+paradas['stop_lon'] = paradas['stop_lon'].astype(float)
+
+heat_data = [[row['stop_lat'], row['stop_lon']] for index, row in paradas.iterrows()]
+heat_data
+
+HeatMap(heat_data).add_to(m)
+
+m
+
+```
+
+
+## Densidad de puntos
+```{python}
+
+from folium import plugins
+from folium.plugins import HeatMap
+
+m = paradas.explore()
+paradas['stop_lat'] = paradas['stop_lat'].astype(float)
+paradas['stop_lon'] = paradas['stop_lon'].astype(float)
+
+heat_data = [[row['stop_lat'], row['stop_lon']] for index, row in paradas.iterrows()]
+heat_data
+
+HeatMap(heat_data).add_to(m)
+
+m
+
+```
+
+
+
+## Bajar datos desde OpenStreetMap {.scrollable .micro}
+ 
+Podemos descargar datos desde Open Street Map con el paquete `osmnx`
+
+
+```{python}
+#| echo: true 
+import osmnx as ox
+
+
+lugar = "Renca, Chile"
+tags = {'landuse': True}   
+
+uso_suelo = ox.geometries_from_place(lugar, tags)
+uso_suelo.head()
+```
+
+
+## Y hacer nuestro mapa con explore {.scrollable}
+
+```{python}
+#| echo: true 
+#| code-fold: show
+#| code-summary: "Código"
+
+import geopandas as gpd
+import osmnx as ox
+
+lugar = "Renca, Chile"
+tags = {'landuse': True}   
+
+uso_suelo = ox.geometries_from_place(lugar, tags)
+uso_suelo
+
+
+uso_suelo.explore("landuse", tiles = "CartoDB Positron", tooltip=False, 
+                            popup=["landuse"], highlight = True)
+```
+
+
+## Rasters
+
+```{python}
+#| echo: true
+#| eval: false
+from rasterio.crs import CRS
+import cartopy
+import matplotlib.pyplot as plt
+import xarray as xr
+import rioxarray
+
+r = xr.open_rasterio("data/soil_moisture.tif")
+crs_utm = CRS.from_string('EPSG:3857')
+r2 = r.rio.reproject(crs_utm)
+
+fig, ax = plt.subplots(dpi = 300, figsize=(4, 4), 
+subplot_kw=dict(projection=cartopy.crs.Mercator())) 
+
+r.plot(cbar_kwargs={'label': "Humedad de Suelo [mm]", 
+                    "orientation": "horizontal"}, 
+                    cmap = "PuBuGn")
+plt.title("")
+plt.axis('off')
+plt.show()
+```
+
+## Rasters
+
+
+
+```{python}
+#| echo : false
+#| eval : true
+#| fig-align: center
+from rasterio.crs import CRS
+import cartopy
+import matplotlib.pyplot as plt
+import xarray as xr
+import rioxarray
+
+r = xr.open_rasterio("data/soil_moisture.tif")
+crs_utm = CRS.from_string('EPSG:3857')
+r2 = r.rio.reproject(crs_utm)
+
+fig, ax = plt.subplots(dpi = 300, figsize=(4, 4), 
+subplot_kw=dict(projection=cartopy.crs.Mercator())) 
+
+r.plot(cbar_kwargs={'label': "Humedad de Suelo [mm]", 
+                    "orientation": "horizontal"}, 
+                    cmap = "PuBuGn")
+plt.title("")
+plt.axis('off')
+plt.show()
+```
+
+
+## Palabras finales {.fondomint}
+
+- ¡Hagan mapas!
+
+- Mapas son una representación en 2d de un mundo en 3d
+
+- Sesgos, ética
+
+- Calidad de los datos
+
