@@ -3,6 +3,9 @@ format:
   revealjs:
     theme: syles.scss
     fontcolor: "#515151"
+self-contained: true
+execute: 
+  include: true    
 ---
 
 
@@ -189,76 +192,142 @@ Pycon Chile 2022
 
 ## geopandas
 
+GeoPandas, amplia la librería de ciencia de datos `pandas` añadiendo soporte para datos geoespaciales. 
+
+![](https://geopandas.org/en/stable/_images/dataframe.svg)
+
+## Nuestro primer mapa
+
 ```{python}
 #| echo: true 
+#| fig-align: center
+#| out-width: 40%
 
 import geopandas as gpd
-
-paradas = gpd.read_file("data/paradas_transantiago.json")
-paradas.plot();
+comunas = gpd.read_file("data/comunas_valparaiso_geo.shp")
+comunas.plot("Provincia", legend = True, figsize = (6, 6));
 ```
+
+## Personalizándolo con matplotlib
+
+```{python}
+#| echo: true 
+#| code-fold: true
+#| code-summary: "Código"
+#| fig-align: center
+
+import matplotlib.pyplot as plt
+from matplotlib_scalebar.scalebar import ScaleBar
+import geopandas as gpd
+
+comunas = gpd.read_file("data/comunas_valparaiso_geo.shp")
+
+d = comunas.to_crs(32719)
+
+ax = d.plot("Provincia", legend = True, cmap = "Pastel2", 
+legend_kwds={'loc': 'upper left', 'bbox_to_anchor':(1, 0.5)}, 
+figsize = (6, 6))
+
+
+ax.set_axis_off()
+
+ax.add_artist(ScaleBar(1))
+
+x, y, arrow_length = 0.1, 1, 0.1
+ax.annotate('N', xy=(x, y), xytext=(x, y-arrow_length),
+            arrowprops=dict(facecolor='black', width=2, headwidth=8),
+            ha='center', va='center', fontsize=10,
+            xycoords=ax.transAxes);
+
+```
+
 
 ## geopandas + folium
 
+&nbsp;
+
+Tal como el método `plot()`, geopandas tiene un método llamado `explore()` que nos permite hacer visualizaciones dinámicas con `folium`.
+
+`folium` nos permite utilizar en Python la librería `leaflet.js`
+
+&nbsp;
+
 ```{python}
 #| echo: true
+#| eval: false
 import geopandas as gpd
 
 paradas = gpd.read_file("data/paradas_transantiago.json")
 paradas.explore()
 ```
 
+---
+
+## geopandas .explore()
+
+```{python}
+#| echo: false
+#| eval: true
+import geopandas as gpd
+
+paradas = gpd.read_file("data/paradas_transantiago.json")
+paradas.explore(zoom_start=11)
+```
+
 ## folium plugins
+
 ```{python}
 #| echo: true
 #| eval: false
 from folium import plugins
 from folium.plugins import HeatMap
 
+# guardamos nuestro mapa inicial en un objeto
 m = paradas.explore()
+
+# nos aseguramos que las coordenadas presentes en la tabla sean de tipo numérico
 paradas['stop_lat'] = paradas['stop_lat'].astype(float)
 paradas['stop_lon'] = paradas['stop_lon'].astype(float)
 
+# generamos una lista con latitudes y longitudes
 heat_data = [[row['stop_lat'], row['stop_lon']] for index, row in paradas.iterrows()]
-heat_data
 
+# Aplicamos la función HeatMap e incluimos al mapa inicial
 HeatMap(heat_data).add_to(m)
-
 m
-
 ```
 
 
+
 ## Densidad de puntos
+
 ```{python}
+#| echo: false
+#| eval: true
 
 from folium import plugins
 from folium.plugins import HeatMap
 
-m = paradas.explore()
+m = paradas.explore(zoom_start=11)
+
 paradas['stop_lat'] = paradas['stop_lat'].astype(float)
 paradas['stop_lon'] = paradas['stop_lon'].astype(float)
-
 heat_data = [[row['stop_lat'], row['stop_lon']] for index, row in paradas.iterrows()]
-heat_data
-
 HeatMap(heat_data).add_to(m)
-
 m
-
 ```
 
 
-
-## Bajar datos desde OpenStreetMap {.scrollable .micro}
+## Bajar datos desde OpenStreetMap
  
+
 Podemos descargar datos desde Open Street Map con el paquete `osmnx`
 
 
 ```{python}
 #| echo: true 
+#| eval: false
 import osmnx as ox
-
 
 lugar = "Renca, Chile"
 tags = {'landuse': True}   
@@ -267,14 +336,27 @@ uso_suelo = ox.geometries_from_place(lugar, tags)
 uso_suelo.head()
 ```
 
+## Bajar datos desde OpenStreetMap {.scrollable}
 
-## Y hacer nuestro mapa con explore {.scrollable}
+::: {.micro}
+```{python}
+#| echo: false
+#| eval: true
+import osmnx as ox
+
+lugar = "Renca, Chile"
+tags = {'landuse': True}   
+
+uso_suelo = ox.geometries_from_place(lugar, tags)
+uso_suelo.head()
+```
+:::
+
+## Y hacer nuestro mapa con explore
 
 ```{python}
 #| echo: true 
-#| code-fold: show
-#| code-summary: "Código"
-
+#| eval: false
 import geopandas as gpd
 import osmnx as ox
 
@@ -282,32 +364,57 @@ lugar = "Renca, Chile"
 tags = {'landuse': True}   
 
 uso_suelo = ox.geometries_from_place(lugar, tags)
-uso_suelo
 
-
-uso_suelo.explore("landuse", tiles = "CartoDB Positron", tooltip=False, 
-                            popup=["landuse"], highlight = True)
+uso_suelo.explore(
+  "landuse",
+  tiles = "CartoDB Positron",
+  tooltip = False,
+  popup = ["landuse"],
+  highlight = True
+)
 ```
 
+## Y hacer nuestro mapa con explore
+
+```{python}
+#| echo: false
+#| eval: true
+import geopandas as gpd
+import osmnx as ox
+lugar = "Renca, Chile"
+tags = {'landuse': True}   
+uso_suelo = ox.geometries_from_place(lugar, tags)
+
+uso_suelo.explore(
+  "landuse",
+  tiles = "CartoDB Positron",
+  tooltip = False,
+  popup = ["landuse"],
+  highlight = True,
+  zoom_start = 13
+)
+```
 
 ## Rasters
+
+::: {.peque}
+
+Existen varias formas de visualizar rasters, pero acá mostraré la forma más simple que es usando `matplotlib`
+
+:::
 
 ```{python}
 #| echo: true
 #| eval: false
-from rasterio.crs import CRS
 import cartopy
 import matplotlib.pyplot as plt
 import xarray as xr
 import rioxarray
 
 r = xr.open_rasterio("data/soil_moisture.tif")
-crs_utm = CRS.from_string('EPSG:3857')
-r2 = r.rio.reproject(crs_utm)
 
 fig, ax = plt.subplots(dpi = 300, figsize=(4, 4), 
-subplot_kw=dict(projection=cartopy.crs.Mercator())) 
-
+subplot_kw = dict(projection = cartopy.crs.Mercator())) 
 r.plot(cbar_kwargs={'label': "Humedad de Suelo [mm]", 
                     "orientation": "horizontal"}, 
                     cmap = "PuBuGn")
@@ -318,25 +425,20 @@ plt.show()
 
 ## Rasters
 
-
-
 ```{python}
 #| echo : false
 #| eval : true
 #| fig-align: center
-from rasterio.crs import CRS
+
 import cartopy
 import matplotlib.pyplot as plt
 import xarray as xr
 import rioxarray
 
 r = xr.open_rasterio("data/soil_moisture.tif")
-crs_utm = CRS.from_string('EPSG:3857')
-r2 = r.rio.reproject(crs_utm)
 
 fig, ax = plt.subplots(dpi = 300, figsize=(4, 4), 
-subplot_kw=dict(projection=cartopy.crs.Mercator())) 
-
+subplot_kw = dict(projection = cartopy.crs.Mercator())) 
 r.plot(cbar_kwargs={'label': "Humedad de Suelo [mm]", 
                     "orientation": "horizontal"}, 
                     cmap = "PuBuGn")
@@ -356,3 +458,28 @@ plt.show()
 
 - Calidad de los datos
 
+## Recursos
+
+::: {.micro}
+### Libros
+
+- [Geocomputation with Python](https://geocompr.github.io/py/) *en desarrollo
+- [Geographic Data Science with Python](https://geographicdata.science/book/intro.html)
+
+### Cursos y tutoriales
+
+- [Spatial data science for sustainable development](https://sustainability-gis.readthedocs.io/en/latest/index.html)
+
+- [Geographic Data Science](https://darribas.org/gds_course/content/home.html)
+
+- [Geospatial Data and Maps with Python for Data Umbrella](https://github.com/christyheaton/Data_Umbrella_Geospatial_Data)
+
+- [Blog de Qiusheng Wu](https://blog.gishub.org)
+
+- [Earth Data Analytics Online Certificate](https://www.earthdatascience.org/courses/intro-to-earth-analytics/spatial-data-vector-shapefiles/python-customize-map-legends-geopandas/)
+
+- [Introducción al Análisis de Datos Geoespaciales con Python](https://github.com/sporella/datos_geoespaciales_python)
+
+- [MappingGIS](https://mappinggis.com/tag/python/)
+
+:::
