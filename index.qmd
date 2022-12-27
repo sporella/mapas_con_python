@@ -20,7 +20,7 @@ Pycon Chile 2022
 
 ::: {.columns}
 ::: {.column width="60%" layout-align="left"}
-\> Stephanie Orellana (@sporella)
+\> Stephanie Orellana (`@sporella/@sporella.dev`)
 
 \> Ingeniera Agrónoma y Magister en Recursos Naturales
 
