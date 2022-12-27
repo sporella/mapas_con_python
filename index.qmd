@@ -20,7 +20,11 @@ Pycon Chile 2022
 
 ::: {.columns}
 ::: {.column width="60%" layout-align="left"}
-\> Stephanie Orellana (`@sporella/@sporella.dev`)
+\> Stephanie Orellana 
+
+{{< iconify mdi twitter >}} `@sporella` 
+
+{{< iconify mdi instagram >}} `@sporella.dev`
 
 \> Ingeniera Agrónoma y Magister en Recursos Naturales
 
@@ -29,7 +33,7 @@ Pycon Chile 2022
 \> PyLadies Valparaíso
 :::
 
-::: {.column width="40%" layout-align="left"}
+::: {.column width="40%" layout-align="right"}
 ![](img/humedad_suelo.png){width=70%}
 ![](img/pyladies_valpo_logo.png){width=70%}
 :::
@@ -192,7 +196,7 @@ Pycon Chile 2022
 
 ## geopandas
 
-GeoPandas, amplia la librería de ciencia de datos `pandas` añadiendo soporte para datos geoespaciales. 
+GeoPandas, amplía la librería de ciencia de datos `pandas` añadiendo soporte para datos geoespaciales. 
 
 ![](https://geopandas.org/en/stable/_images/dataframe.svg)
 
